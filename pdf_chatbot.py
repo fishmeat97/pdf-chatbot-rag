@@ -1,663 +1,127 @@
-{
- "cells": [
-  {
-   "cell_type": "code",
-   "execution_count": 1,
-   "id": "c8de909d-2877-4627-a619-7e3152551445",
-   "metadata": {},
-   "outputs": [
-    {
-     "name": "stdout",
-     "output_type": "stream",
-     "text": [
-      "Collecting openai\n",
-      "  Downloading openai-2.8.1-py3-none-any.whl.metadata (29 kB)\n",
-      "Collecting langchain\n",
-      "  Downloading langchain-1.0.8-py3-none-any.whl.metadata (4.9 kB)\n",
-      "Collecting langchain-community\n",
-      "  Downloading langchain_community-0.4.1-py3-none-any.whl.metadata (3.0 kB)\n",
-      "Requirement already satisfied: streamlit in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (1.45.1)\n",
-      "Collecting pypdf\n",
-      "  Downloading pypdf-6.3.0-py3-none-any.whl.metadata (7.1 kB)\n",
-      "Collecting faiss-cpu\n",
-      "  Downloading faiss_cpu-1.13.0-cp313-cp313-win_amd64.whl.metadata (7.7 kB)\n",
-      "Collecting tiktoken\n",
-      "  Downloading tiktoken-0.12.0-cp313-cp313-win_amd64.whl.metadata (6.9 kB)\n",
-      "Requirement already satisfied: anyio<5,>=3.5.0 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from openai) (4.7.0)\n",
-      "Requirement already satisfied: distro<2,>=1.7.0 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from openai) (1.9.0)\n",
-      "Requirement already satisfied: httpx<1,>=0.23.0 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from openai) (0.28.1)\n",
-      "Collecting jiter<1,>=0.10.0 (from openai)\n",
-      "  Downloading jiter-0.12.0-cp313-cp313-win_amd64.whl.metadata (5.3 kB)\n",
-      "Requirement already satisfied: pydantic<3,>=1.9.0 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from openai) (2.10.3)\n",
-      "Requirement already satisfied: sniffio in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from openai) (1.3.0)\n",
-      "Requirement already satisfied: tqdm>4 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from openai) (4.67.1)\n",
-      "Requirement already satisfied: typing-extensions<5,>=4.11 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from openai) (4.12.2)\n",
-      "Requirement already satisfied: idna>=2.8 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from anyio<5,>=3.5.0->openai) (3.7)\n",
-      "Requirement already satisfied: certifi in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from httpx<1,>=0.23.0->openai) (2025.4.26)\n",
-      "Requirement already satisfied: httpcore==1.* in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from httpx<1,>=0.23.0->openai) (1.0.9)\n",
-      "Requirement already satisfied: h11>=0.16 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from httpcore==1.*->httpx<1,>=0.23.0->openai) (0.16.0)\n",
-      "Requirement already satisfied: annotated-types>=0.6.0 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from pydantic<3,>=1.9.0->openai) (0.6.0)\n",
-      "Requirement already satisfied: pydantic-core==2.27.1 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from pydantic<3,>=1.9.0->openai) (2.27.1)\n",
-      "Collecting langchain-core<2.0.0,>=1.0.6 (from langchain)\n",
-      "  Downloading langchain_core-1.1.0-py3-none-any.whl.metadata (3.6 kB)\n",
-      "Collecting langgraph<1.1.0,>=1.0.2 (from langchain)\n",
-      "  Downloading langgraph-1.0.3-py3-none-any.whl.metadata (7.8 kB)\n",
-      "Requirement already satisfied: jsonpatch<2.0.0,>=1.33.0 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from langchain-core<2.0.0,>=1.0.6->langchain) (1.33)\n",
-      "Collecting langsmith<1.0.0,>=0.3.45 (from langchain-core<2.0.0,>=1.0.6->langchain)\n",
-      "  Downloading langsmith-0.4.46-py3-none-any.whl.metadata (14 kB)\n",
-      "Requirement already satisfied: packaging<26.0.0,>=23.2.0 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from langchain-core<2.0.0,>=1.0.6->langchain) (24.2)\n",
-      "Requirement already satisfied: pyyaml<7.0.0,>=5.3.0 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from langchain-core<2.0.0,>=1.0.6->langchain) (6.0.2)\n",
-      "Requirement already satisfied: tenacity!=8.4.0,<10.0.0,>=8.1.0 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from langchain-core<2.0.0,>=1.0.6->langchain) (9.0.0)\n",
-      "Requirement already satisfied: jsonpointer>=1.9 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from jsonpatch<2.0.0,>=1.33.0->langchain-core<2.0.0,>=1.0.6->langchain) (2.1)\n",
-      "Collecting langgraph-checkpoint<4.0.0,>=2.1.0 (from langgraph<1.1.0,>=1.0.2->langchain)\n",
-      "  Downloading langgraph_checkpoint-3.0.1-py3-none-any.whl.metadata (4.7 kB)\n",
-      "Collecting langgraph-prebuilt<1.1.0,>=1.0.2 (from langgraph<1.1.0,>=1.0.2->langchain)\n",
-      "  Downloading langgraph_prebuilt-1.0.5-py3-none-any.whl.metadata (5.2 kB)\n",
-      "Collecting langgraph-sdk<0.3.0,>=0.2.2 (from langgraph<1.1.0,>=1.0.2->langchain)\n",
-      "  Downloading langgraph_sdk-0.2.9-py3-none-any.whl.metadata (1.5 kB)\n",
-      "Collecting xxhash>=3.5.0 (from langgraph<1.1.0,>=1.0.2->langchain)\n",
-      "  Downloading xxhash-3.6.0-cp313-cp313-win_amd64.whl.metadata (13 kB)\n",
-      "Collecting ormsgpack>=1.12.0 (from langgraph-checkpoint<4.0.0,>=2.1.0->langgraph<1.1.0,>=1.0.2->langchain)\n",
-      "  Downloading ormsgpack-1.12.0-cp313-cp313-win_amd64.whl.metadata (1.2 kB)\n",
-      "Collecting orjson>=3.10.1 (from langgraph-sdk<0.3.0,>=0.2.2->langgraph<1.1.0,>=1.0.2->langchain)\n",
-      "  Downloading orjson-3.11.4-cp313-cp313-win_amd64.whl.metadata (42 kB)\n",
-      "Requirement already satisfied: requests-toolbelt>=1.0.0 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.0.6->langchain) (1.0.0)\n",
-      "Requirement already satisfied: requests>=2.0.0 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.0.6->langchain) (2.32.3)\n",
-      "Requirement already satisfied: zstandard>=0.23.0 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.0.6->langchain) (0.23.0)\n",
-      "Collecting langchain-classic<2.0.0,>=1.0.0 (from langchain-community)\n",
-      "  Downloading langchain_classic-1.0.0-py3-none-any.whl.metadata (3.9 kB)\n",
-      "Requirement already satisfied: SQLAlchemy<3.0.0,>=1.4.0 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from langchain-community) (2.0.39)\n",
-      "Collecting requests>=2.0.0 (from langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.0.6->langchain)\n",
-      "  Downloading requests-2.32.5-py3-none-any.whl.metadata (4.9 kB)\n",
-      "Requirement already satisfied: aiohttp<4.0.0,>=3.8.3 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from langchain-community) (3.11.10)\n",
-      "Collecting dataclasses-json<0.7.0,>=0.6.7 (from langchain-community)\n",
-      "  Downloading dataclasses_json-0.6.7-py3-none-any.whl.metadata (25 kB)\n",
-      "Collecting pydantic-settings<3.0.0,>=2.10.1 (from langchain-community)\n",
-      "  Downloading pydantic_settings-2.12.0-py3-none-any.whl.metadata (3.4 kB)\n",
-      "Collecting httpx-sse<1.0.0,>=0.4.0 (from langchain-community)\n",
-      "  Downloading httpx_sse-0.4.3-py3-none-any.whl.metadata (9.7 kB)\n",
-      "Requirement already satisfied: numpy>=2.1.0 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from langchain-community) (2.1.3)\n",
-      "Requirement already satisfied: aiohappyeyeballs>=2.3.0 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from aiohttp<4.0.0,>=3.8.3->langchain-community) (2.4.4)\n",
-      "Requirement already satisfied: aiosignal>=1.1.2 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from aiohttp<4.0.0,>=3.8.3->langchain-community) (1.2.0)\n",
-      "Requirement already satisfied: attrs>=17.3.0 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from aiohttp<4.0.0,>=3.8.3->langchain-community) (24.3.0)\n",
-      "Requirement already satisfied: frozenlist>=1.1.1 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from aiohttp<4.0.0,>=3.8.3->langchain-community) (1.5.0)\n",
-      "Requirement already satisfied: multidict<7.0,>=4.5 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from aiohttp<4.0.0,>=3.8.3->langchain-community) (6.1.0)\n",
-      "Requirement already satisfied: propcache>=0.2.0 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from aiohttp<4.0.0,>=3.8.3->langchain-community) (0.3.1)\n",
-      "Requirement already satisfied: yarl<2.0,>=1.17.0 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from aiohttp<4.0.0,>=3.8.3->langchain-community) (1.18.0)\n",
-      "Collecting marshmallow<4.0.0,>=3.18.0 (from dataclasses-json<0.7.0,>=0.6.7->langchain-community)\n",
-      "  Downloading marshmallow-3.26.1-py3-none-any.whl.metadata (7.3 kB)\n",
-      "Collecting typing-inspect<1,>=0.4.0 (from dataclasses-json<0.7.0,>=0.6.7->langchain-community)\n",
-      "  Downloading typing_inspect-0.9.0-py3-none-any.whl.metadata (1.5 kB)\n",
-      "Collecting langchain-text-splitters<2.0.0,>=1.0.0 (from langchain-classic<2.0.0,>=1.0.0->langchain-community)\n",
-      "  Downloading langchain_text_splitters-1.0.0-py3-none-any.whl.metadata (2.6 kB)\n",
-      "Requirement already satisfied: python-dotenv>=0.21.0 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from pydantic-settings<3.0.0,>=2.10.1->langchain-community) (1.1.0)\n",
-      "Collecting typing-inspection>=0.4.0 (from pydantic-settings<3.0.0,>=2.10.1->langchain-community)\n",
-      "  Downloading typing_inspection-0.4.2-py3-none-any.whl.metadata (2.6 kB)\n",
-      "Requirement already satisfied: charset_normalizer<4,>=2 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from requests>=2.0.0->langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.0.6->langchain) (3.3.2)\n",
-      "Requirement already satisfied: urllib3<3,>=1.21.1 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from requests>=2.0.0->langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.0.6->langchain) (2.3.0)\n",
-      "Requirement already satisfied: greenlet!=0.4.17 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from SQLAlchemy<3.0.0,>=1.4.0->langchain-community) (3.1.1)\n",
-      "Requirement already satisfied: mypy-extensions>=0.3.0 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from typing-inspect<1,>=0.4.0->dataclasses-json<0.7.0,>=0.6.7->langchain-community) (1.0.0)\n",
-      "Requirement already satisfied: altair<6,>=4.0 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from streamlit) (5.5.0)\n",
-      "Requirement already satisfied: blinker<2,>=1.5.0 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from streamlit) (1.9.0)\n",
-      "Requirement already satisfied: cachetools<6,>=4.0 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from streamlit) (5.5.1)\n",
-      "Requirement already satisfied: click<9,>=7.0 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from streamlit) (8.1.8)\n",
-      "Requirement already satisfied: pandas<3,>=1.4.0 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from streamlit) (2.2.3)\n",
-      "Requirement already satisfied: pillow<12,>=7.1.0 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from streamlit) (11.1.0)\n",
-      "Requirement already satisfied: protobuf<7,>=3.20 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from streamlit) (5.29.3)\n",
-      "Requirement already satisfied: pyarrow>=7.0 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from streamlit) (19.0.0)\n",
-      "Requirement already satisfied: toml<2,>=0.10.1 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from streamlit) (0.10.2)\n",
-      "Requirement already satisfied: watchdog<7,>=2.1.5 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from streamlit) (4.0.2)\n",
-      "Requirement already satisfied: gitpython!=3.1.19,<4,>=3.0.7 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from streamlit) (3.1.43)\n",
-      "Requirement already satisfied: tornado<7,>=6.0.3 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from streamlit) (6.5.1)\n",
-      "Requirement already satisfied: jinja2 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from altair<6,>=4.0->streamlit) (3.1.6)\n",
-      "Requirement already satisfied: jsonschema>=3.0 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from altair<6,>=4.0->streamlit) (4.23.0)\n",
-      "Requirement already satisfied: narwhals>=1.14.2 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from altair<6,>=4.0->streamlit) (1.31.0)\n",
-      "Requirement already satisfied: colorama in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from click<9,>=7.0->streamlit) (0.4.6)\n",
-      "Requirement already satisfied: gitdb<5,>=4.0.1 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from gitpython!=3.1.19,<4,>=3.0.7->streamlit) (4.0.7)\n",
-      "Requirement already satisfied: smmap<5,>=3.0.1 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from gitdb<5,>=4.0.1->gitpython!=3.1.19,<4,>=3.0.7->streamlit) (4.0.0)\n",
-      "Requirement already satisfied: python-dateutil>=2.8.2 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from pandas<3,>=1.4.0->streamlit) (2.9.0.post0)\n",
-      "Requirement already satisfied: pytz>=2020.1 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from pandas<3,>=1.4.0->streamlit) (2024.1)\n",
-      "Requirement already satisfied: tzdata>=2022.7 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from pandas<3,>=1.4.0->streamlit) (2025.2)\n",
-      "Requirement already satisfied: regex>=2022.1.18 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from tiktoken) (2024.11.6)\n",
-      "Requirement already satisfied: jsonschema-specifications>=2023.03.6 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from jsonschema>=3.0->altair<6,>=4.0->streamlit) (2023.7.1)\n",
-      "Requirement already satisfied: referencing>=0.28.4 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from jsonschema>=3.0->altair<6,>=4.0->streamlit) (0.30.2)\n",
-      "Requirement already satisfied: rpds-py>=0.7.1 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from jsonschema>=3.0->altair<6,>=4.0->streamlit) (0.22.3)\n",
-      "Requirement already satisfied: six>=1.5 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from python-dateutil>=2.8.2->pandas<3,>=1.4.0->streamlit) (1.17.0)\n",
-      "Requirement already satisfied: MarkupSafe>=2.0 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from jinja2->altair<6,>=4.0->streamlit) (3.0.2)\n",
-      "Downloading openai-2.8.1-py3-none-any.whl (1.0 MB)\n",
-      "   ---------------------------------------- 0.0/1.0 MB ? eta -:--:--\n",
-      "   ---------------------------------------- 1.0/1.0 MB 9.1 MB/s eta 0:00:00\n",
-      "Downloading jiter-0.12.0-cp313-cp313-win_amd64.whl (204 kB)\n",
-      "Downloading langchain-1.0.8-py3-none-any.whl (93 kB)\n",
-      "Downloading langchain_core-1.1.0-py3-none-any.whl (473 kB)\n",
-      "Downloading langgraph-1.0.3-py3-none-any.whl (156 kB)\n",
-      "Downloading langgraph_checkpoint-3.0.1-py3-none-any.whl (46 kB)\n",
-      "Downloading langgraph_prebuilt-1.0.5-py3-none-any.whl (35 kB)\n",
-      "Downloading langgraph_sdk-0.2.9-py3-none-any.whl (56 kB)\n",
-      "Downloading langsmith-0.4.46-py3-none-any.whl (411 kB)\n",
-      "Downloading langchain_community-0.4.1-py3-none-any.whl (2.5 MB)\n",
-      "   ---------------------------------------- 0.0/2.5 MB ? eta -:--:--\n",
-      "   ------------------------------------- -- 2.4/2.5 MB 12.1 MB/s eta 0:00:01\n",
-      "   ---------------------------------------- 2.5/2.5 MB 10.7 MB/s eta 0:00:00\n",
-      "Downloading dataclasses_json-0.6.7-py3-none-any.whl (28 kB)\n",
-      "Downloading httpx_sse-0.4.3-py3-none-any.whl (9.0 kB)\n",
-      "Downloading langchain_classic-1.0.0-py3-none-any.whl (1.0 MB)\n",
-      "   ---------------------------------------- 0.0/1.0 MB ? eta -:--:--\n",
-      "   ---------------------------------------- 1.0/1.0 MB 9.7 MB/s eta 0:00:00\n",
-      "Downloading langchain_text_splitters-1.0.0-py3-none-any.whl (33 kB)\n",
-      "Downloading marshmallow-3.26.1-py3-none-any.whl (50 kB)\n",
-      "Downloading pydantic_settings-2.12.0-py3-none-any.whl (51 kB)\n",
-      "Downloading requests-2.32.5-py3-none-any.whl (64 kB)\n",
-      "Downloading typing_inspect-0.9.0-py3-none-any.whl (8.8 kB)\n",
-      "Downloading pypdf-6.3.0-py3-none-any.whl (328 kB)\n",
-      "Downloading faiss_cpu-1.13.0-cp313-cp313-win_amd64.whl (18.7 MB)\n",
-      "   ---------------------------------------- 0.0/18.7 MB ? eta -:--:--\n",
-      "   ----- ---------------------------------- 2.4/18.7 MB 11.7 MB/s eta 0:00:02\n",
-      "   ---------- ----------------------------- 5.0/18.7 MB 12.0 MB/s eta 0:00:02\n",
-      "   ---------------- ----------------------- 7.6/18.7 MB 12.0 MB/s eta 0:00:01\n",
-      "   --------------------- ------------------ 10.0/18.7 MB 11.9 MB/s eta 0:00:01\n",
-      "   -------------------------- ------------- 12.6/18.7 MB 12.0 MB/s eta 0:00:01\n",
-      "   ------------------------------- -------- 14.9/18.7 MB 12.1 MB/s eta 0:00:01\n",
-      "   ------------------------------------- -- 17.6/18.7 MB 12.1 MB/s eta 0:00:01\n",
-      "   ---------------------------------------- 18.7/18.7 MB 11.4 MB/s eta 0:00:00\n",
-      "Downloading tiktoken-0.12.0-cp313-cp313-win_amd64.whl (879 kB)\n",
-      "   ---------------------------------------- 0.0/879.1 kB ? eta -:--:--\n",
-      "   --------------------------------------- 879.1/879.1 kB 10.1 MB/s eta 0:00:00\n",
-      "Downloading orjson-3.11.4-cp313-cp313-win_amd64.whl (131 kB)\n",
-      "Downloading ormsgpack-1.12.0-cp313-cp313-win_amd64.whl (112 kB)\n",
-      "Downloading typing_inspection-0.4.2-py3-none-any.whl (14 kB)\n",
-      "Downloading xxhash-3.6.0-cp313-cp313-win_amd64.whl (31 kB)\n",
-      "Installing collected packages: xxhash, typing-inspection, typing-inspect, requests, pypdf, ormsgpack, orjson, marshmallow, jiter, httpx-sse, faiss-cpu, tiktoken, dataclasses-json, pydantic-settings, openai, langsmith, langgraph-sdk, langchain-core, langgraph-checkpoint, langchain-text-splitters, langgraph-prebuilt, langchain-classic, langgraph, langchain-community, langchain\n",
-      "\n",
-      "  Attempting uninstall: requests\n",
-      "\n",
-      "    Found existing installation: requests 2.32.3\n",
-      "\n",
-      "   ---- -----------------------------------  3/25 [requests]\n",
-      "    Uninstalling requests-2.32.3:\n",
-      "   ---- -----------------------------------  3/25 [requests]\n",
-      "      Successfully uninstalled requests-2.32.3\n",
-      "   ---- -----------------------------------  3/25 [requests]\n",
-      "   ---- -----------------------------------  3/25 [requests]\n",
-      "   ------ ---------------------------------  4/25 [pypdf]\n",
-      "   ------ ---------------------------------  4/25 [pypdf]\n",
-      "   ------ ---------------------------------  4/25 [pypdf]\n",
-      "   ------ ---------------------------------  4/25 [pypdf]\n",
-      "   --------- ------------------------------  6/25 [orjson]\n",
-      "   ------------ ---------------------------  8/25 [jiter]\n",
-      "   ---------------- ----------------------- 10/25 [faiss-cpu]\n",
-      "   ---------------- ----------------------- 10/25 [faiss-cpu]\n",
-      "   ---------------- ----------------------- 10/25 [faiss-cpu]\n",
-      "   ---------------- ----------------------- 10/25 [faiss-cpu]\n",
-      "   ---------------- ----------------------- 10/25 [faiss-cpu]\n",
-      "   ---------------- ----------------------- 10/25 [faiss-cpu]\n",
-      "   ---------------- ----------------------- 10/25 [faiss-cpu]\n",
-      "   ---------------- ----------------------- 10/25 [faiss-cpu]\n",
-      "   ------------------- -------------------- 12/25 [dataclasses-json]\n",
-      "  Attempting uninstall: pydantic-settings\n",
-      "   ------------------- -------------------- 12/25 [dataclasses-json]\n",
-      "    Found existing installation: pydantic-settings 2.6.1\n",
-      "   ------------------- -------------------- 12/25 [dataclasses-json]\n",
-      "    Uninstalling pydantic-settings-2.6.1:\n",
-      "   ------------------- -------------------- 12/25 [dataclasses-json]\n",
-      "      Successfully uninstalled pydantic-settings-2.6.1\n",
-      "   ------------------- -------------------- 12/25 [dataclasses-json]\n",
-      "   -------------------- ------------------- 13/25 [pydantic-settings]\n",
-      "   -------------------- ------------------- 13/25 [pydantic-settings]\n",
-      "   ---------------------- ----------------- 14/25 [openai]\n",
-      "   ---------------------- ----------------- 14/25 [openai]\n",
-      "   ---------------------- ----------------- 14/25 [openai]\n",
-      "   ---------------------- ----------------- 14/25 [openai]\n",
-      "   ---------------------- ----------------- 14/25 [openai]\n",
-      "   ---------------------- ----------------- 14/25 [openai]\n",
-      "   ---------------------- ----------------- 14/25 [openai]\n",
-      "   ---------------------- ----------------- 14/25 [openai]\n",
-      "   ---------------------- ----------------- 14/25 [openai]\n",
-      "   ---------------------- ----------------- 14/25 [openai]\n",
-      "   ---------------------- ----------------- 14/25 [openai]\n",
-      "   ---------------------- ----------------- 14/25 [openai]\n",
-      "   ---------------------- ----------------- 14/25 [openai]\n",
-      "   ---------------------- ----------------- 14/25 [openai]\n",
-      "   ---------------------- ----------------- 14/25 [openai]\n",
-      "   ---------------------- ----------------- 14/25 [openai]\n",
-      "   ---------------------- ----------------- 14/25 [openai]\n",
-      "   ---------------------- ----------------- 14/25 [openai]\n",
-      "   ---------------------- ----------------- 14/25 [openai]\n",
-      "   ---------------------- ----------------- 14/25 [openai]\n",
-      "   ---------------------- ----------------- 14/25 [openai]\n",
-      "   ---------------------- ----------------- 14/25 [openai]\n",
-      "   ---------------------- ----------------- 14/25 [openai]\n",
-      "   ---------------------- ----------------- 14/25 [openai]\n",
-      "   ---------------------- ----------------- 14/25 [openai]\n",
-      "   ---------------------- ----------------- 14/25 [openai]\n",
-      "   ---------------------- ----------------- 14/25 [openai]\n",
-      "   ---------------------- ----------------- 14/25 [openai]\n",
-      "   ---------------------- ----------------- 14/25 [openai]\n",
-      "   ---------------------- ----------------- 14/25 [openai]\n",
-      "   ---------------------- ----------------- 14/25 [openai]\n",
-      "   ---------------------- ----------------- 14/25 [openai]\n",
-      "   ---------------------- ----------------- 14/25 [openai]\n",
-      "   ---------------------- ----------------- 14/25 [openai]\n",
-      "   ------------------------ --------------- 15/25 [langsmith]\n",
-      "   ------------------------ --------------- 15/25 [langsmith]\n",
-      "   ------------------------ --------------- 15/25 [langsmith]\n",
-      "   ------------------------ --------------- 15/25 [langsmith]\n",
-      "   ------------------------- -------------- 16/25 [langgraph-sdk]\n",
-      "   --------------------------- ------------ 17/25 [langchain-core]\n",
-      "   --------------------------- ------------ 17/25 [langchain-core]\n",
-      "   --------------------------- ------------ 17/25 [langchain-core]\n",
-      "   --------------------------- ------------ 17/25 [langchain-core]\n",
-      "   --------------------------- ------------ 17/25 [langchain-core]\n",
-      "   --------------------------- ------------ 17/25 [langchain-core]\n",
-      "   --------------------------- ------------ 17/25 [langchain-core]\n",
-      "   --------------------------- ------------ 17/25 [langchain-core]\n",
-      "   --------------------------- ------------ 17/25 [langchain-core]\n",
-      "   --------------------------- ------------ 17/25 [langchain-core]\n",
-      "   ---------------------------- ----------- 18/25 [langgraph-checkpoint]\n",
-      "   -------------------------------- ------- 20/25 [langgraph-prebuilt]\n",
-      "   --------------------------------- ------ 21/25 [langchain-classic]\n",
-      "   --------------------------------- ------ 21/25 [langchain-classic]\n",
-      "   --------------------------------- ------ 21/25 [langchain-classic]\n",
-      "   --------------------------------- ------ 21/25 [langchain-classic]\n",
-      "   --------------------------------- ------ 21/25 [langchain-classic]\n",
-      "   --------------------------------- ------ 21/25 [langchain-classic]\n",
-      "   --------------------------------- ------ 21/25 [langchain-classic]\n",
-      "   --------------------------------- ------ 21/25 [langchain-classic]\n",
-      "   --------------------------------- ------ 21/25 [langchain-classic]\n",
-      "   --------------------------------- ------ 21/25 [langchain-classic]\n",
-      "   --------------------------------- ------ 21/25 [langchain-classic]\n",
-      "   --------------------------------- ------ 21/25 [langchain-classic]\n",
-      "   --------------------------------- ------ 21/25 [langchain-classic]\n",
-      "   --------------------------------- ------ 21/25 [langchain-classic]\n",
-      "   --------------------------------- ------ 21/25 [langchain-classic]\n",
-      "   --------------------------------- ------ 21/25 [langchain-classic]\n",
-      "   --------------------------------- ------ 21/25 [langchain-classic]\n",
-      "   --------------------------------- ------ 21/25 [langchain-classic]\n",
-      "   --------------------------------- ------ 21/25 [langchain-classic]\n",
-      "   --------------------------------- ------ 21/25 [langchain-classic]\n",
-      "   --------------------------------- ------ 21/25 [langchain-classic]\n",
-      "   --------------------------------- ------ 21/25 [langchain-classic]\n",
-      "   --------------------------------- ------ 21/25 [langchain-classic]\n",
-      "   --------------------------------- ------ 21/25 [langchain-classic]\n",
-      "   --------------------------------- ------ 21/25 [langchain-classic]\n",
-      "   --------------------------------- ------ 21/25 [langchain-classic]\n",
-      "   --------------------------------- ------ 21/25 [langchain-classic]\n",
-      "   --------------------------------- ------ 21/25 [langchain-classic]\n",
-      "   --------------------------------- ------ 21/25 [langchain-classic]\n",
-      "   --------------------------------- ------ 21/25 [langchain-classic]\n",
-      "   --------------------------------- ------ 21/25 [langchain-classic]\n",
-      "   --------------------------------- ------ 21/25 [langchain-classic]\n",
-      "   --------------------------------- ------ 21/25 [langchain-classic]\n",
-      "   --------------------------------- ------ 21/25 [langchain-classic]\n",
-      "   --------------------------------- ------ 21/25 [langchain-classic]\n",
-      "   --------------------------------- ------ 21/25 [langchain-classic]\n",
-      "   --------------------------------- ------ 21/25 [langchain-classic]\n",
-      "   --------------------------------- ------ 21/25 [langchain-classic]\n",
-      "   --------------------------------- ------ 21/25 [langchain-classic]\n",
-      "   --------------------------------- ------ 21/25 [langchain-classic]\n",
-      "   --------------------------------- ------ 21/25 [langchain-classic]\n",
-      "   --------------------------------- ------ 21/25 [langchain-classic]\n",
-      "   ----------------------------------- ---- 22/25 [langgraph]\n",
-      "   ----------------------------------- ---- 22/25 [langgraph]\n",
-      "   ----------------------------------- ---- 22/25 [langgraph]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   ------------------------------------ --- 23/25 [langchain-community]\n",
-      "   -------------------------------------- - 24/25 [langchain]\n",
-      "   -------------------------------------- - 24/25 [langchain]\n",
-      "   ---------------------------------------- 25/25 [langchain]\n",
-      "\n",
-      "Successfully installed dataclasses-json-0.6.7 faiss-cpu-1.13.0 httpx-sse-0.4.3 jiter-0.12.0 langchain-1.0.8 langchain-classic-1.0.0 langchain-community-0.4.1 langchain-core-1.1.0 langchain-text-splitters-1.0.0 langgraph-1.0.3 langgraph-checkpoint-3.0.1 langgraph-prebuilt-1.0.5 langgraph-sdk-0.2.9 langsmith-0.4.46 marshmallow-3.26.1 openai-2.8.1 orjson-3.11.4 ormsgpack-1.12.0 pydantic-settings-2.12.0 pypdf-6.3.0 requests-2.32.5 tiktoken-0.12.0 typing-inspect-0.9.0 typing-inspection-0.4.2 xxhash-3.6.0\n",
-      "Note: you may need to restart the kernel to use updated packages.\n"
-     ]
-    }
-   ],
-   "source": [
-    "pip install openai langchain langchain-community streamlit pypdf faiss-cpu tiktoken"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 2,
-   "id": "e07bfeb4-5eaa-46e6-ba3a-4334f677eee4",
-   "metadata": {},
-   "outputs": [
-    {
-     "name": "stdout",
-     "output_type": "stream",
-     "text": [
-      "Requirement already satisfied: langchain-text-splitters in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (1.0.0)\n",
-      "Requirement already satisfied: langchain-core<2.0.0,>=1.0.0 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from langchain-text-splitters) (1.1.0)\n",
-      "Requirement already satisfied: jsonpatch<2.0.0,>=1.33.0 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from langchain-core<2.0.0,>=1.0.0->langchain-text-splitters) (1.33)\n",
-      "Requirement already satisfied: langsmith<1.0.0,>=0.3.45 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from langchain-core<2.0.0,>=1.0.0->langchain-text-splitters) (0.4.46)\n",
-      "Requirement already satisfied: packaging<26.0.0,>=23.2.0 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from langchain-core<2.0.0,>=1.0.0->langchain-text-splitters) (24.2)\n",
-      "Requirement already satisfied: pydantic<3.0.0,>=2.7.4 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from langchain-core<2.0.0,>=1.0.0->langchain-text-splitters) (2.10.3)\n",
-      "Requirement already satisfied: pyyaml<7.0.0,>=5.3.0 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from langchain-core<2.0.0,>=1.0.0->langchain-text-splitters) (6.0.2)\n",
-      "Requirement already satisfied: tenacity!=8.4.0,<10.0.0,>=8.1.0 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from langchain-core<2.0.0,>=1.0.0->langchain-text-splitters) (9.0.0)\n",
-      "Requirement already satisfied: typing-extensions<5.0.0,>=4.7.0 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from langchain-core<2.0.0,>=1.0.0->langchain-text-splitters) (4.12.2)\n",
-      "Requirement already satisfied: jsonpointer>=1.9 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from jsonpatch<2.0.0,>=1.33.0->langchain-core<2.0.0,>=1.0.0->langchain-text-splitters) (2.1)\n",
-      "Requirement already satisfied: httpx<1,>=0.23.0 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.0.0->langchain-text-splitters) (0.28.1)\n",
-      "Requirement already satisfied: orjson>=3.9.14 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.0.0->langchain-text-splitters) (3.11.4)\n",
-      "Requirement already satisfied: requests-toolbelt>=1.0.0 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.0.0->langchain-text-splitters) (1.0.0)\n",
-      "Requirement already satisfied: requests>=2.0.0 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.0.0->langchain-text-splitters) (2.32.5)\n",
-      "Requirement already satisfied: zstandard>=0.23.0 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.0.0->langchain-text-splitters) (0.23.0)\n",
-      "Requirement already satisfied: anyio in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from httpx<1,>=0.23.0->langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.0.0->langchain-text-splitters) (4.7.0)\n",
-      "Requirement already satisfied: certifi in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from httpx<1,>=0.23.0->langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.0.0->langchain-text-splitters) (2025.4.26)\n",
-      "Requirement already satisfied: httpcore==1.* in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from httpx<1,>=0.23.0->langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.0.0->langchain-text-splitters) (1.0.9)\n",
-      "Requirement already satisfied: idna in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from httpx<1,>=0.23.0->langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.0.0->langchain-text-splitters) (3.7)\n",
-      "Requirement already satisfied: h11>=0.16 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from httpcore==1.*->httpx<1,>=0.23.0->langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.0.0->langchain-text-splitters) (0.16.0)\n",
-      "Requirement already satisfied: annotated-types>=0.6.0 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from pydantic<3.0.0,>=2.7.4->langchain-core<2.0.0,>=1.0.0->langchain-text-splitters) (0.6.0)\n",
-      "Requirement already satisfied: pydantic-core==2.27.1 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from pydantic<3.0.0,>=2.7.4->langchain-core<2.0.0,>=1.0.0->langchain-text-splitters) (2.27.1)\n",
-      "Requirement already satisfied: charset_normalizer<4,>=2 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from requests>=2.0.0->langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.0.0->langchain-text-splitters) (3.3.2)\n",
-      "Requirement already satisfied: urllib3<3,>=1.21.1 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from requests>=2.0.0->langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.0.0->langchain-text-splitters) (2.3.0)\n",
-      "Requirement already satisfied: sniffio>=1.1 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from anyio->httpx<1,>=0.23.0->langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.0.0->langchain-text-splitters) (1.3.0)\n",
-      "Note: you may need to restart the kernel to use updated packages.\n"
-     ]
-    }
-   ],
-   "source": [
-    "pip install langchain-text-splitters"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 6,
-   "id": "b868f614-bc48-4762-b2bb-c92817509f7a",
-   "metadata": {},
-   "outputs": [
-    {
-     "name": "stdout",
-     "output_type": "stream",
-     "text": [
-      "Requirement already satisfied: langchain in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (1.0.8)\n",
-      "Requirement already satisfied: langchain-core<2.0.0,>=1.0.6 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from langchain) (1.1.0)\n",
-      "Requirement already satisfied: langgraph<1.1.0,>=1.0.2 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from langchain) (1.0.3)\n",
-      "Requirement already satisfied: pydantic<3.0.0,>=2.7.4 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from langchain) (2.10.3)\n",
-      "Requirement already satisfied: jsonpatch<2.0.0,>=1.33.0 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from langchain-core<2.0.0,>=1.0.6->langchain) (1.33)\n",
-      "Requirement already satisfied: langsmith<1.0.0,>=0.3.45 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from langchain-core<2.0.0,>=1.0.6->langchain) (0.4.46)\n",
-      "Requirement already satisfied: packaging<26.0.0,>=23.2.0 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from langchain-core<2.0.0,>=1.0.6->langchain) (24.2)\n",
-      "Requirement already satisfied: pyyaml<7.0.0,>=5.3.0 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from langchain-core<2.0.0,>=1.0.6->langchain) (6.0.2)\n",
-      "Requirement already satisfied: tenacity!=8.4.0,<10.0.0,>=8.1.0 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from langchain-core<2.0.0,>=1.0.6->langchain) (9.0.0)\n",
-      "Requirement already satisfied: typing-extensions<5.0.0,>=4.7.0 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from langchain-core<2.0.0,>=1.0.6->langchain) (4.12.2)\n",
-      "Requirement already satisfied: jsonpointer>=1.9 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from jsonpatch<2.0.0,>=1.33.0->langchain-core<2.0.0,>=1.0.6->langchain) (2.1)\n",
-      "Requirement already satisfied: langgraph-checkpoint<4.0.0,>=2.1.0 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from langgraph<1.1.0,>=1.0.2->langchain) (3.0.1)\n",
-      "Requirement already satisfied: langgraph-prebuilt<1.1.0,>=1.0.2 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from langgraph<1.1.0,>=1.0.2->langchain) (1.0.5)\n",
-      "Requirement already satisfied: langgraph-sdk<0.3.0,>=0.2.2 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from langgraph<1.1.0,>=1.0.2->langchain) (0.2.9)\n",
-      "Requirement already satisfied: xxhash>=3.5.0 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from langgraph<1.1.0,>=1.0.2->langchain) (3.6.0)\n",
-      "Requirement already satisfied: ormsgpack>=1.12.0 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from langgraph-checkpoint<4.0.0,>=2.1.0->langgraph<1.1.0,>=1.0.2->langchain) (1.12.0)\n",
-      "Requirement already satisfied: httpx>=0.25.2 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from langgraph-sdk<0.3.0,>=0.2.2->langgraph<1.1.0,>=1.0.2->langchain) (0.28.1)\n",
-      "Requirement already satisfied: orjson>=3.10.1 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from langgraph-sdk<0.3.0,>=0.2.2->langgraph<1.1.0,>=1.0.2->langchain) (3.11.4)\n",
-      "Requirement already satisfied: requests-toolbelt>=1.0.0 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.0.6->langchain) (1.0.0)\n",
-      "Requirement already satisfied: requests>=2.0.0 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.0.6->langchain) (2.32.5)\n",
-      "Requirement already satisfied: zstandard>=0.23.0 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.0.6->langchain) (0.23.0)\n",
-      "Requirement already satisfied: anyio in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from httpx>=0.25.2->langgraph-sdk<0.3.0,>=0.2.2->langgraph<1.1.0,>=1.0.2->langchain) (4.7.0)\n",
-      "Requirement already satisfied: certifi in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from httpx>=0.25.2->langgraph-sdk<0.3.0,>=0.2.2->langgraph<1.1.0,>=1.0.2->langchain) (2025.4.26)\n",
-      "Requirement already satisfied: httpcore==1.* in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from httpx>=0.25.2->langgraph-sdk<0.3.0,>=0.2.2->langgraph<1.1.0,>=1.0.2->langchain) (1.0.9)\n",
-      "Requirement already satisfied: idna in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from httpx>=0.25.2->langgraph-sdk<0.3.0,>=0.2.2->langgraph<1.1.0,>=1.0.2->langchain) (3.7)\n",
-      "Requirement already satisfied: h11>=0.16 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from httpcore==1.*->httpx>=0.25.2->langgraph-sdk<0.3.0,>=0.2.2->langgraph<1.1.0,>=1.0.2->langchain) (0.16.0)\n",
-      "Requirement already satisfied: annotated-types>=0.6.0 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from pydantic<3.0.0,>=2.7.4->langchain) (0.6.0)\n",
-      "Requirement already satisfied: pydantic-core==2.27.1 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from pydantic<3.0.0,>=2.7.4->langchain) (2.27.1)\n",
-      "Requirement already satisfied: charset_normalizer<4,>=2 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from requests>=2.0.0->langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.0.6->langchain) (3.3.2)\n",
-      "Requirement already satisfied: urllib3<3,>=1.21.1 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from requests>=2.0.0->langsmith<1.0.0,>=0.3.45->langchain-core<2.0.0,>=1.0.6->langchain) (2.3.0)\n",
-      "Requirement already satisfied: sniffio>=1.1 in c:\\users\\tiffa\\anaconda3\\lib\\site-packages (from anyio->httpx>=0.25.2->langgraph-sdk<0.3.0,>=0.2.2->langgraph<1.1.0,>=1.0.2->langchain) (1.3.0)\n",
-      "Note: you may need to restart the kernel to use updated packages.\n"
-     ]
-    }
-   ],
-   "source": [
-    "pip install langchain"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 7,
-   "id": "976a01dd-780a-41df-85c5-c452d269025e",
-   "metadata": {},
-   "outputs": [
-    {
-     "ename": "ModuleNotFoundError",
-     "evalue": "No module named 'langchain.chains'",
-     "output_type": "error",
-     "traceback": [
-      "\u001b[1;31m---------------------------------------------------------------------------\u001b[0m",
-      "\u001b[1;31mModuleNotFoundError\u001b[0m                       Traceback (most recent call last)",
-      "Cell \u001b[1;32mIn[7], line 7\u001b[0m\n\u001b[0;32m      5\u001b[0m \u001b[38;5;28;01mfrom\u001b[39;00m\u001b[38;5;250m \u001b[39m\u001b[38;5;21;01mlangchain_community\u001b[39;00m\u001b[38;5;21;01m.\u001b[39;00m\u001b[38;5;21;01membeddings\u001b[39;00m\u001b[38;5;250m \u001b[39m\u001b[38;5;28;01mimport\u001b[39;00m OpenAIEmbeddings\n\u001b[0;32m      6\u001b[0m \u001b[38;5;28;01mfrom\u001b[39;00m\u001b[38;5;250m \u001b[39m\u001b[38;5;21;01mlangchain_community\u001b[39;00m\u001b[38;5;21;01m.\u001b[39;00m\u001b[38;5;21;01mvectorstores\u001b[39;00m\u001b[38;5;250m \u001b[39m\u001b[38;5;28;01mimport\u001b[39;00m FAISS\n\u001b[1;32m----> 7\u001b[0m \u001b[38;5;28;01mfrom\u001b[39;00m\u001b[38;5;250m \u001b[39m\u001b[38;5;21;01mlangchain\u001b[39;00m\u001b[38;5;21;01m.\u001b[39;00m\u001b[38;5;21;01mchains\u001b[39;00m\u001b[38;5;250m \u001b[39m\u001b[38;5;28;01mimport\u001b[39;00m ConversationalRetrievalChain\n\u001b[0;32m      8\u001b[0m \u001b[38;5;28;01mfrom\u001b[39;00m\u001b[38;5;250m \u001b[39m\u001b[38;5;21;01mlangchain_community\u001b[39;00m\u001b[38;5;21;01m.\u001b[39;00m\u001b[38;5;21;01mchat_models\u001b[39;00m\u001b[38;5;250m \u001b[39m\u001b[38;5;28;01mimport\u001b[39;00m ChatOpenAI\n\u001b[0;32m      9\u001b[0m \u001b[38;5;28;01mfrom\u001b[39;00m\u001b[38;5;250m \u001b[39m\u001b[38;5;21;01mlangchain\u001b[39;00m\u001b[38;5;21;01m.\u001b[39;00m\u001b[38;5;21;01mmemory\u001b[39;00m\u001b[38;5;250m \u001b[39m\u001b[38;5;28;01mimport\u001b[39;00m ConversationBufferMemory\n",
-      "\u001b[1;31mModuleNotFoundError\u001b[0m: No module named 'langchain.chains'"
-     ]
-    }
-   ],
-   "source": [
-    "import streamlit as st\n",
-    "from PyPDF2 import PdfReader\n",
-    "# --- 修改點：使用新的 langchain_text_splitters (修正您的錯誤) ---\n",
-    "from langchain_text_splitters import RecursiveCharacterTextSplitter\n",
-    "from langchain_community.embeddings import OpenAIEmbeddings\n",
-    "from langchain_community.vectorstores import FAISS\n",
-    "from langchain.chains import ConversationalRetrievalChain\n",
-    "from langchain_community.chat_models import ChatOpenAI\n",
-    "from langchain.memory import ConversationBufferMemory\n",
-    "import os\n",
-    "\n",
-    "# --- 1. 頁面設定 ---\n",
-    "st.set_page_config(page_title=\"My AI Research Assistant\", page_icon=\"🤖\")\n",
-    "st.header(\"🤖 Chat with your PDF (RAG Prototype)\")\n",
-    "\n",
-    "# --- 2. 側邊欄：設定與上傳 ---\n",
-    "with st.sidebar:\n",
-    "    st.title(\"Configuration\")\n",
-    "    openai_api_key = st.text_input(\"Enter OpenAI API Key\", type=\"password\")\n",
-    "    uploaded_file = st.file_uploader(\"Upload your PDF here\", type=\"pdf\")\n",
-    "    st.markdown(\"---\")\n",
-    "    st.markdown(\"\"\"\n",
-    "    **How it works:**\n",
-    "    1. **Ingest**: Reads the PDF text.\n",
-    "    2. **Split**: Breaks text into chunks.\n",
-    "    3. **Embed**: Converts text to numbers (Vectors).\n",
-    "    4. **Store**: Saves vectors in FAISS (Vector DB).\n",
-    "    5. **Retrieve**: Finds relevant info for your query.\n",
-    "    \"\"\")\n",
-    "\n",
-    "# --- 3. 核心邏輯函數 ---\n",
-    "\n",
-    "def get_pdf_text(pdf_docs):\n",
-    "    \"\"\"讀取 PDF 文字\"\"\"\n",
-    "    text = \"\"\n",
-    "    pdf_reader = PdfReader(pdf_docs)\n",
-    "    for page in pdf_reader.pages:\n",
-    "        text += page.extract_text()\n",
-    "    return text\n",
-    "\n",
-    "def get_text_chunks(text):\n",
-    "    \"\"\"將文字切分成小塊 (Chunks)\"\"\"\n",
-    "    # 使用新的切割器\n",
-    "    text_splitter = RecursiveCharacterTextSplitter(\n",
-    "        chunk_size=1000,  # 每一塊的大小\n",
-    "        chunk_overlap=200, # 重疊部分，避免切斷上下文\n",
-    "        length_function=len\n",
-    "    )\n",
-    "    chunks = text_splitter.split_text(text)\n",
-    "    return chunks\n",
-    "\n",
-    "def get_vectorstore(text_chunks, api_key):\n",
-    "    \"\"\"將文字轉為向量並存入資料庫 (FAISS)\"\"\"\n",
-    "    # 使用 OpenAI 的 Embeddings 模型將文字變成數字向量\n",
-    "    embeddings = OpenAIEmbeddings(openai_api_key=api_key)\n",
-    "    # FAISS 是 Facebook 開發的向量搜尋庫，速度極快\n",
-    "    vectorstore = FAISS.from_texts(texts=text_chunks, embedding=embeddings)\n",
-    "    return vectorstore\n",
-    "\n",
-    "def get_conversation_chain(vectorstore, api_key):\n",
-    "    \"\"\"建立對話鏈 (LangChain 的核心)\"\"\"\n",
-    "    # 使用 GPT-3.5-turbo 作為大腦\n",
-    "    llm = ChatOpenAI(openai_api_key=api_key, temperature=0.5, model_name=\"gpt-3.5-turbo\")\n",
-    "    \n",
-    "    # 設定記憶體，讓 AI 記得妳上一句說了什麼\n",
-    "    memory = ConversationBufferMemory(\n",
-    "        memory_key='chat_history', \n",
-    "        return_messages=True\n",
-    "    )\n",
-    "    \n",
-    "    # 建立 RAG 鏈：結合檢索 (VectorStore) 與 生成 (LLM)\n",
-    "    conversation_chain = ConversationalRetrievalChain.from_llm(\n",
-    "        llm=llm,\n",
-    "        retriever=vectorstore.as_retriever(),\n",
-    "        memory=memory\n",
-    "    )\n",
-    "    return conversation_chain\n",
-    "\n",
-    "# --- 4. 主程式邏輯 ---\n",
-    "\n",
-    "if openai_api_key:\n",
-    "    # 初始化 session state (用來儲存對話歷史)\n",
-    "    if \"conversation\" not in st.session_state:\n",
-    "        st.session_state.conversation = None\n",
-    "    if \"chat_history\" not in st.session_state:\n",
-    "        st.session_state.chat_history = None\n",
-    "\n",
-    "    # 當使用者上傳檔案後\n",
-    "    if uploaded_file is not None:\n",
-    "        # 只有在還沒處理過檔案時才執行，避免重複運算\n",
-    "        if st.session_state.conversation is None:\n",
-    "            with st.spinner(\"Processing PDF... (Extracting -> Chunking -> Embedding)\"):\n",
-    "                try:\n",
-    "                    # A. 讀取 PDF\n",
-    "                    raw_text = get_pdf_text(uploaded_file)\n",
-    "                    \n",
-    "                    # B. 切分文字 (Splitting)\n",
-    "                    text_chunks = get_text_chunks(raw_text)\n",
-    "                    \n",
-    "                    # C. 建立向量資料庫 (Vector Store)\n",
-    "                    vectorstore = get_vectorstore(text_chunks, openai_api_key)\n",
-    "                    \n",
-    "                    # D. 建立對話鏈 (Chain)\n",
-    "                    st.session_state.conversation = get_conversation_chain(vectorstore, openai_api_key)\n",
-    "                    \n",
-    "                    st.success(\"PDF Processed! You can now ask questions.\")\n",
-    "                except Exception as e:\n",
-    "                    st.error(f\"Error processing PDF: {e}\")\n",
-    "\n",
-    "        # --- 5. 聊天介面 ---\n",
-    "        user_question = st.text_input(\"Ask a question about your document:\")\n",
-    "        \n",
-    "        if user_question:\n",
-    "            if st.session_state.conversation:\n",
-    "                # 傳送問題給 LangChain\n",
-    "                response = st.session_state.conversation({'question': user_question})\n",
-    "                st.session_state.chat_history = response['chat_history']\n",
-    "\n",
-    "                # 顯示對話紀錄\n",
-    "                for i, message in enumerate(reversed(st.session_state.chat_history)):\n",
-    "                    if i % 2 == 0: # AI 的回答\n",
-    "                        st.markdown(f\"🤖 **AI:** {message.content}\")\n",
-    "                        st.markdown(\"---\")\n",
-    "                    else: # 妳的問題\n",
-    "                        st.markdown(f\"👤 **You:** {message.content}\")\n",
-    "else:\n",
-    "    st.warning(\"Please enter your OpenAI API Key in the sidebar to start.\")"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 4,
-   "id": "c50a89b8-ed26-43bf-949e-412fd058bb92",
-   "metadata": {},
-   "outputs": [
-    {
-     "ename": "SyntaxError",
-     "evalue": "invalid syntax (2959459083.py, line 1)",
-     "output_type": "error",
-     "traceback": [
-      "\u001b[1;36m  Cell \u001b[1;32mIn[4], line 1\u001b[1;36m\u001b[0m\n\u001b[1;33m    streamlit run pdf_chatbot.py\u001b[0m\n\u001b[1;37m              ^\u001b[0m\n\u001b[1;31mSyntaxError\u001b[0m\u001b[1;31m:\u001b[0m invalid syntax\n"
-     ]
-    }
-   ],
-   "source": [
-    "streamlit run pdf_chatbot.py"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "id": "7b895f73-62ea-4cd5-9107-b2af2d1c55e6",
-   "metadata": {},
-   "outputs": [],
-   "source": []
-  }
- ],
- "metadata": {
-  "kernelspec": {
-   "display_name": "Python 3 (ipykernel)",
-   "language": "python",
-   "name": "python3"
-  },
-  "language_info": {
-   "codemirror_mode": {
-    "name": "ipython",
-    "version": 3
-   },
-   "file_extension": ".py",
-   "mimetype": "text/x-python",
-   "name": "python",
-   "nbconvert_exporter": "python",
-   "pygments_lexer": "ipython3",
-   "version": "3.13.5"
-  }
- },
- "nbformat": 4,
- "nbformat_minor": 5
-}
+import streamlit as st
+from PyPDF2 import PdfReader
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_community.embeddings import OpenAIEmbeddings
+from langchain_community.vectorstores import FAISS
+from langchain.chains import ConversationalRetrievalChain
+from langchain_community.chat_models import ChatOpenAI
+from langchain.memory import ConversationBufferMemory
+import os
+
+# --- 1. 頁面設定 ---
+st.set_page_config(page_title="My AI Research Assistant", page_icon="🤖")
+st.header("🤖 Chat with your PDF (RAG Prototype)")
+
+# --- 2. 側邊欄：設定與上傳 ---
+with st.sidebar:
+    st.title("Configuration")
+    # 使用 password 類型隱藏 API Key
+    openai_api_key = st.text_input("Enter OpenAI API Key", type="password")
+    uploaded_file = st.file_uploader("Upload your PDF here", type="pdf")
+    
+    st.markdown("---")
+    st.markdown("""
+    **How it works:**
+    1. **Ingest**: Reads the PDF text.
+    2. **Split**: Breaks text into chunks.
+    3. **Embed**: Converts text to numbers (Vectors).
+    4. **Store**: Saves vectors in FAISS (Vector DB).
+    5. **Retrieve**: Finds relevant info for your query.
+    """)
+
+# --- 3. 核心邏輯函數 ---
+
+def get_pdf_text(pdf_docs):
+    """讀取 PDF 文字"""
+    text = ""
+    pdf_reader = PdfReader(pdf_docs)
+    for page in pdf_reader.pages:
+        page_text = page.extract_text()
+        if page_text:
+            text += page_text
+    return text
+
+def get_text_chunks(text):
+    """將文字切分成小塊 (Chunks)"""
+    text_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=1000,
+        chunk_overlap=200,
+        length_function=len
+    )
+    chunks = text_splitter.split_text(text)
+    return chunks
+
+def get_vectorstore(text_chunks, api_key):
+    """將文字轉為向量並存入資料庫 (FAISS)"""
+    embeddings = OpenAIEmbeddings(openai_api_key=api_key)
+    vectorstore = FAISS.from_texts(texts=text_chunks, embedding=embeddings)
+    return vectorstore
+
+def get_conversation_chain(vectorstore, api_key):
+    """建立對話鏈 (LangChain 的核心)"""
+    llm = ChatOpenAI(openai_api_key=api_key, temperature=0.5, model_name="gpt-3.5-turbo")
+    
+    memory = ConversationBufferMemory(
+        memory_key='chat_history', 
+        return_messages=True
+    )
+    
+    conversation_chain = ConversationalRetrievalChain.from_llm(
+        llm=llm,
+        retriever=vectorstore.as_retriever(),
+        memory=memory
+    )
+    return conversation_chain
+
+# --- 4. 主程式邏輯 ---
+
+if openai_api_key:
+    # 初始化 session state
+    if "conversation" not in st.session_state:
+        st.session_state.conversation = None
+    if "chat_history" not in st.session_state:
+        st.session_state.chat_history = None
+
+    # 當使用者上傳檔案後
+    if uploaded_file is not None:
+        # 只有在還沒處理過檔案時才執行
+        if st.session_state.conversation is None:
+            with st.spinner("Processing PDF... (Extracting -> Chunking -> Embedding)"):
+                try:
+                    # A. 讀取 PDF
+                    raw_text = get_pdf_text(uploaded_file)
+                    
+                    if not raw_text:
+                        st.error("Could not extract text from this PDF. It might be scanned images.")
+                    else:
+                        # B. 切分文字
+                        text_chunks = get_text_chunks(raw_text)
+                        
+                        # C. 建立向量資料庫
+                        vectorstore = get_vectorstore(text_chunks, openai_api_key)
+                        
+                        # D. 建立對話鏈
+                        st.session_state.conversation = get_conversation_chain(vectorstore, openai_api_key)
+                        
+                        st.success("PDF Processed! You can now ask questions.")
+                except Exception as e:
+                    st.error(f"An error occurred: {e}")
+
+        # --- 5. 聊天介面 ---
+        user_question = st.text_input("Ask a question about your document:")
+        
+        if user_question:
+            if st.session_state.conversation:
+                with st.spinner("Thinking..."):
+                    response = st.session_state.conversation({'question': user_question})
+                    st.session_state.chat_history = response['chat_history']
+
+                # 顯示對話紀錄
+                for i, message in enumerate(reversed(st.session_state.chat_history)):
+                    if i % 2 == 0: # AI 的回答
+                        st.markdown(f"🤖 **AI:** {message.content}")
+                        st.markdown("---")
+                    else: # 妳的問題
+                        st.markdown(f"👤 **You:** {message.content}")
+else:
+    st.warning("Please enter your OpenAI API Key in the sidebar to start.")
